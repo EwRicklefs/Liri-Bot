@@ -1,9 +1,16 @@
 //*****Variables******
 require("dotenv").config();
+const axios = require("axios")
+const moment = require('moment')
 
 var keys = require("./keys.js");
 
-var spotify = new Spotify(keys.spotify);
+var Spotify = require('node-spotify-api');
+
+var spotify = new Spotify({
+    id:keys.spotify.id,
+    secret:keys.spotify.secret
+});
 
 var command = process.argv[2]
 var value = process.argv[3]
@@ -11,45 +18,67 @@ var value = process.argv[3]
 //*****Functions******
 function concert() {
     var apiCall = 'https://rest.bandsintown.com/artists/' + value + '/events?app_id=codingbootcamp'
-    var apiValue
     var venue
     var location
     var eventDate
-    //Spotify API call based off value
-    console.log('Venue is ' + venue)
-    console.log('Venue location is' + location)
-    console.log('Date of the event is ' + moment(eventDate, "MM/DD/YYYY"))
-    
-}
-
-function spotify() {
-    var apiCall
-    var apiResponse
-    var artist
-    var songName
-    var prevLink
-    var album
-    //how to handle no response value from spotify?
-
-    if (value) {
-        //values are set to spotify api call values
-    } else {
-        artist = 'Ace of Base'
-        songName = 'The Sign'
-        prevLink //put link here
-        album //put album here
+    const getConcert = async () => {
+        try {
+            return await axios.get(apiCall)
+        } catch (error) {
+            console.error(error)
+        }
     }
 
-    console.log('Artist is ' + artist)
-    console.log('Song name is ' + songName)
-    console.log('Preview link - ' + prevLink)
-    console.log ('Albume is ' + album)
+    const getInfo = async () => {
+        const val = await getConcert()
+        venue = val.data[0].venue.name
+        location = val.data[0].venue.city
+        eventDate = val.data[0].datetime
+        console.log('Venue is ' + venue)
+        console.log('Venue location is ' + location)
+        eventDate= moment(eventDate).format('MM/DD/YYYY')
+        console.log('Date of the event is ' + eventDate)
+    }
+
+    getInfo()
+}
+
+function spotifyThis() {
+    var songName = "The Sign"
+    var artist = "Ace of Base"
+    var prevLink = 'https://open.spotify.com/track/0hrBpAOgrt8RXigk83LLNE?si=2Q8HBazESKSNa6o--jryWw'
+    var album = "Happy Nation"
+    if (value) {
+    spotify
+        .search({ type: 'track', query: value })
+        .then(function(response) {
+            var song = response.tracks.items[0]
+            var artistList = song.artists
+            songName = song.name
+            artist = []
+            artistList.forEach(function(objs){
+                artist.push(objs.name)
+            })
+            prevLink = song.preview_url
+            album = song.album.name
+
+            console.log('Artist is ' + artist)
+            console.log('Song name is ' + songName)
+            console.log('Preview link - ' + prevLink)
+            console.log ('Album is ' + album)
+        })
+        .catch(function(err) {
+            console.log(err);
+        });
+    } else {
+        console.log('Artist is ' + artist)
+        console.log('Song name is ' + songName)
+        console.log('Preview link - ' + prevLink)
+        console.log ('Album is ' + album)
+    }
 }
 
 function movie() {
-    var apiCall
-    var apiResponse
-
     //movie values
     var title
     var year
@@ -59,21 +88,54 @@ function movie() {
     var language
     var plot
     var actors
-
+    var queryUrl = "http://www.omdbapi.com/?t=" + value + "&y=&plot=short&apikey=trilogy"
     if (value) {
-        //set values to API call values
+    axios.get(queryUrl).then(
+        function(response) {
+            var movie = response.data
+            var ratings = movie.Ratings
+            title = movie.Title
+            year = movie.Year
+            imdbRat = movie.imdbRating
+            rtRat = Object.values(ratings[1])[1]
+            prodCountry = movie.Country
+            language = movie.Language
+            plot = movie.Plot
+            actors = movie.Actors
+            console.log('Title is ' + title)
+            console.log('Year the movie came out is ' + year)
+            console.log('IMDB Rating is ' + imdbRat + '. Rotten tomatoes rating is ' + rtRat + '.')
+            console.log('Country of production is ' + prodCountry)
+            console.log('The language of the movie is ' + language)
+            console.log('Plot summary: ' + plot)
+            console.log('Actors in the movie are ' + actors)
+        }
+      );
     } else {
-        title = 'Mr. Nobody'
-        //set rest of the values here
+        axios.get("http://www.omdbapi.com/?t=Mr.Nobody&y=&plot=short&apikey=trilogy").then(
+            function(response) {
+                var movie = response.data
+                var ratings = movie.Ratings
+                title = movie.Title
+                year = movie.Year
+                imdbRat = movie.imdbRating
+                rtRat = Object.values(ratings[1])[1]
+                prodCountry = movie.Country
+                language = movie.Language
+                plot = movie.Plot
+                actors = movie.Actors
+                console.log('Title is ' + title)
+                console.log('Year the movie came out is ' + year)
+                console.log('IMDB Rating is ' + imdbRat + '. Rotten tomatoes rating is ' + rtRat + '.')
+                console.log('Country of production is ' + prodCountry)
+                console.log('The language of the movie is ' + language)
+                console.log('Plot summary: ' + plot)
+                console.log('Actors in the movie are ' + actors)
+            }
+          );
     }
 
-    console.log('Title is ' + title)
-    console.log('Year the movie came out is ' + year)
-    console.log('IMDB Rating is ' + imdbRat + '. Rotten tomatoes rating is ' + rtRat + '.')
-    console.log('Country of production is ' + prodCountry)
-    console.log('The language of the movie is ' + language)
-    console.log('Plot summary: ' + plot)
-    console.log('Actors in the movie are ' + actors)
+    
 }
 
 function doWhat() {
@@ -90,7 +152,7 @@ should take in a function call (spotify/movie/concerts)
 if (command ==='concert-this') {
     concert()
 } else if (command==='spotify-this-song') {
-    spotify()
+    spotifyThis()
 } else if (command === 'movie-this') {
     movie()
 } else if (command === 'do-what-it-says') {
