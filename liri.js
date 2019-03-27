@@ -2,6 +2,7 @@
 require("dotenv").config();
 const axios = require("axios")
 const moment = require('moment')
+var fs = require("fs");
 
 var keys = require("./keys.js");
 
@@ -46,7 +47,7 @@ function concert() {
 function spotifyThis() {
     var songName = "The Sign"
     var artist = "Ace of Base"
-    var prevLink = 'https://open.spotify.com/track/0hrBpAOgrt8RXigk83LLNE?si=2Q8HBazESKSNa6o--jryWw'
+    var prevLink = 'https://p.scdn.co/mp3-preview/af237206f611b722f48620ece049aff3b8650e77?cid=72b39f5b0c8f4c9194f61079063a7b27'
     var album = "Happy Nation"
     if (value) {
     spotify
@@ -139,14 +140,20 @@ function movie() {
 }
 
 function doWhat() {
-    
-/*
-Uses the text in random.txt to make a call
-should take in a function call (spotify/movie/concerts)
-    and a value
-*/
-}
-
+    fs.readFile("random.txt", "utf8", function(error, data) {
+        if (error) {
+          return console.log(error);
+        }
+        var dataArr = data.split(",");
+        value = dataArr[1]
+        if (dataArr[0] ==='concert-this') {
+            concert()
+        } else if (dataArr[0]==='spotify-this-song') {
+            spotifyThis()
+        } else if (dataArr[0] === 'movie-this') {
+            movie()
+        }
+      });
 
 //*****Body of the code*****/
 if (command ==='concert-this') {
