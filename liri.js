@@ -14,7 +14,8 @@ var spotify = new Spotify({
 });
 
 var command = process.argv[2]
-var value = process.argv[3]
+var value = (process.argv).slice(3)
+value.toString(' ')
 
 //*****Functions******
 function concert() {
@@ -154,6 +155,8 @@ function doWhat() {
             movie()
         }
       });
+}
+
 
 //*****Body of the code*****/
 if (command ==='concert-this') {
