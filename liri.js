@@ -91,7 +91,7 @@ function movie() {
     var plot
     var actors
     if (value) {
-        value = value.replace(' ', '+')
+        // value = value.replace(' ', '+')
         var queryUrl = "http://www.omdbapi.com/?t=" + value + "&y=&plot=short&apikey=trilogy"
         axios.get(queryUrl).then(
             function(response) {
