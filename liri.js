@@ -90,29 +90,30 @@ function movie() {
     var language
     var plot
     var actors
-    var queryUrl = "http://www.omdbapi.com/?t=" + value + "&y=&plot=short&apikey=trilogy"
     if (value) {
-    axios.get(queryUrl).then(
-        function(response) {
-            var movie = response.data
-            var ratings = movie.Ratings
-            title = movie.Title
-            year = movie.Year
-            imdbRat = movie.imdbRating
-            rtRat = Object.values(ratings[1])[1]
-            prodCountry = movie.Country
-            language = movie.Language
-            plot = movie.Plot
-            actors = movie.Actors
-            console.log('Title is ' + title)
-            console.log('Year the movie came out is ' + year)
-            console.log('IMDB Rating is ' + imdbRat + '. Rotten tomatoes rating is ' + rtRat + '.')
-            console.log('Country of production is ' + prodCountry)
-            console.log('The language of the movie is ' + language)
-            console.log('Plot summary: ' + plot)
-            console.log('Actors in the movie are ' + actors)
-        }
-      );
+        value = value.replace(' ', '+')
+        var queryUrl = "http://www.omdbapi.com/?t=" + value + "&y=&plot=short&apikey=trilogy"
+        axios.get(queryUrl).then(
+            function(response) {
+                var movie = response.data
+                var ratings = movie.Ratings
+                title = movie.Title
+                year = movie.Year
+                imdbRat = movie.imdbRating
+                rtRat = Object.values(ratings[1])[1]
+                prodCountry = movie.Country
+                language = movie.Language
+                plot = movie.Plot
+                actors = movie.Actors
+                console.log('Title is ' + title)
+                console.log('Year the movie came out is ' + year)
+                console.log('IMDB Rating is ' + imdbRat + '. Rotten tomatoes rating is ' + rtRat + '.')
+                console.log('Country of production is ' + prodCountry)
+                console.log('The language of the movie is ' + language)
+                console.log('Plot summary: ' + plot)
+                console.log('Actors in the movie are ' + actors)
+            }
+        );
     } else {
         axios.get("http://www.omdbapi.com/?t=Mr.Nobody&y=&plot=short&apikey=trilogy").then(
             function(response) {
@@ -154,7 +155,7 @@ function doWhat() {
         } else if (dataArr[0] === 'movie-this') {
             movie()
         }
-      });
+    });
 }
 
 
